@@ -4,7 +4,6 @@ import { Formik } from "formik";
 import { styles } from "../../styles/styles";
 
 const Login = ({ navigation }) => {
-
   return (
     <View style={styles.loginWrapper}>
       <Formik
@@ -12,6 +11,8 @@ const Login = ({ navigation }) => {
         onSubmit={(values) => {
           if (values.email === "admin" && values.password == "admin") {
             navigation.navigate("Dashboard");
+          } else {
+            alert("Invalid Credentials");
           }
         }}
       >
@@ -35,7 +36,10 @@ const Login = ({ navigation }) => {
               onChangeText={props.handleChange("password")}
               value={props.values.password}
             />
-            <TouchableOpacity style={styles.LoginButton} onPress={props.handleSubmit}>
+            <TouchableOpacity
+              style={styles.LoginButton}
+              onPress={props.handleSubmit}
+            >
               <Text style={styles.loginTestButton}>Login</Text>
             </TouchableOpacity>
 
@@ -47,10 +51,8 @@ const Login = ({ navigation }) => {
       </Formik>
 
       <View style={styles.bottomDiv}>
-        <TouchableOpacity  onPress={() => navigation.navigate("Signup")}>
-          <Text style={styles.signupTextFromLogin} >
-            Sign up
-          </Text>
+        <TouchableOpacity onPress={() => navigation.navigate("Signup")}>
+          <Text style={styles.signupTextFromLogin}>Sign up</Text>
         </TouchableOpacity>
       </View>
     </View>
