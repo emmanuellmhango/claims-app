@@ -58,6 +58,7 @@ const Signup = ({ navigation }) => {
             <View style={styles.dobContainer}>
               <TextInput
                 style={styles.ddInput}
+                maxLength={2}
                 placeholder="DD"
                 keyboardType="number-pad"
                 onChangeText={props.handleChange("dd")}
@@ -65,6 +66,7 @@ const Signup = ({ navigation }) => {
               />
               <TextInput
                 style={styles.mmInput}
+                maxLength={2}
                 placeholder="MM"
                 keyboardType="number-pad"
                 onChangeText={props.handleChange("mm")}
@@ -72,6 +74,7 @@ const Signup = ({ navigation }) => {
               />
               <TextInput
                 style={styles.yyInput}
+                maxLength={4}
                 placeholder="YYYY"
                 keyboardType="number-pad"
                 onChangeText={props.handleChange("yy")}
