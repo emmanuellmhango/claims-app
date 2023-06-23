@@ -7,37 +7,36 @@ import Login from "../screens/accessibility/login";
 import Signup from "../screens/accessibility/signup";
 import Dashboard from "../screens/actionpages/dashboard";
 
-
 const screens = {
   Home: {
     screen: Home,
     navigationOptions: {
       headerShown: false,
-    }
+    },
   },
   HomeOptions: {
     screen: HomeOptions,
     navigationOptions: {
       headerShown: false,
-    }
+    },
   },
   Login: {
     screen: Login,
     navigationOptions: {
-      title: '',
-    }
+      title: "",
+    },
   },
   Signup: {
     screen: Signup,
     navigationOptions: {
-      title: '',
-    }
+      title: "",
+    },
   },
   Dashboard: {
     screen: Dashboard,
     navigationOptions: {
       headerShown: false,
-    }
+    },
   },
 };
 

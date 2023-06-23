@@ -4,12 +4,23 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import Home from "./home";
 import MakeClaim from "./makeClaims";
-import Signout from "./signout";
 import ClaimHistory from "./claimHistory";
 
 const Tab = createBottomTabNavigator();
 
-const MyTabs = () => {
+const MyTabs = ({ navigation }) => {
+  const options = {
+    headerStyle: {
+      backgroundColor: "#f2f5f7",
+    },
+    headerTitleStyle: {
+      color: "#6f7173",
+      fontWeight: "bold",
+      alignSelf: "center",
+      textAlign: "center",
+    },
+  };
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -32,8 +43,6 @@ const MyTabs = () => {
             iconName = focused ? "add-circle" : "add-circle-outline";
             iconSize = focused ? size + 10 : size + 5;
             iconColor = "coral";
-          } else if (route.name === "Signout") {
-            iconName = focused ? "log-out" : "log-out-outline";
           } else if (route.name === "Home") {
             iconName = focused ? "home" : "home-outline";
           }
@@ -42,10 +51,9 @@ const MyTabs = () => {
         },
       })}
     >
-      <Tab.Screen name="Home" component={Home} />
-      <Tab.Screen name="Claim" component={MakeClaim} />
-      <Tab.Screen name="History" component={ClaimHistory} />
-      <Tab.Screen name="Signout" component={Signout} />
+      <Tab.Screen name="Home" component={Home} options={options} />
+      <Tab.Screen name="Claim" component={MakeClaim} options={options} />
+      <Tab.Screen name="History" component={ClaimHistory} options={options} />
     </Tab.Navigator>
   );
 };

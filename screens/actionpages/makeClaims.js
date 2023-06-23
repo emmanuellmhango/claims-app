@@ -7,12 +7,16 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
+  ScrollView,
 } from "react-native";
 import { Formik } from "formik";
 import { Picker } from "@react-native-picker/picker";
 import { Camera, CameraType } from "expo-camera";
-import { styles } from "../../styles/styles";
 import * as Location from "expo-location";
+import { Ionicons } from "@expo/vector-icons";
+import { useDispatch } from "react-redux";
+import { addClaim } from "../../state/addClaimSlice";
+import { styles } from "../../styles/styles";
 
 const DismissKeyboard = ({ children }) => (
   <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -21,6 +25,7 @@ const DismissKeyboard = ({ children }) => (
 );
 
 const MakeClaim = () => {
+  const dispatch = useDispatch();
   const [category, setCategory] = useState("");
   const [operator, setOperator] = useState("");
   const [hasCameraPermission, setHasCameraPermission] = useState(null);
@@ -30,7 +35,7 @@ const MakeClaim = () => {
 
   useEffect(() => {
     getLocationAsync();
-  }, []);
+  }, [location]);
 
   const getLocationAsync = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
@@ -38,8 +43,12 @@ const MakeClaim = () => {
       console.log("Permission to access location was denied");
       return;
     }
-    const currentLocation = await Location.getCurrentPositionAsync({});
-    setLocation(currentLocation.coords);
+    try {
+      const { coords } = await Location.getCurrentPositionAsync({});
+      setLocation(coords);
+    } catch (error) {
+      console.log("Error retrieving location:", error);
+    }
   };
 
   useEffect(() => {
@@ -55,6 +64,7 @@ const MakeClaim = () => {
       setImage(data.uri);
     }
   };
+
   if (hasCameraPermission === false) {
     return <Text>No access to camera</Text>;
   }
@@ -76,124 +86,138 @@ const MakeClaim = () => {
   ];
 
   return (
-    <DismissKeyboard>
-      <View style={styles.loginWrapper}>
-        <Formik
-          initialValues={{
-            comment: "",
-            picture: "",
-            category: category,
-            operator: operator,
-            location: location,
-          }}
-          onSubmit={(values) => {
-            console.log(values);
-          }}
-        >
-          {(props) => (
-            <View style={styles.loginForm}>
-              <View style={styles.cameraWrapper}>
-                {image ? (
-                  <Image source={{ uri: image }} style={{ flex: 1 }} />
-                ) : (
-                  <View>
-                    <Camera
-                      style={styles.camera}
-                      type={CameraType.back}
-                      ratio={"1:1"}
-                      ref={(ref) => setCamera(ref)}
-                    ></Camera>
-                    <View
-                      style={{
-                        position: "absolute",
-                        bottom: 0,
-                        flexDirection: "row",
-                        flex: 1,
-                        width: "100%",
-                        padding: 20,
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <View
-                        style={{
-                          alignSelf: "center",
-                          flex: 1,
-                          alignItems: "center",
-                        }}
-                      >
+    <ScrollView contentContainerStyle={styles.claimContainer}>
+      <DismissKeyboard>
+        <View style={styles.loginWrapper}>
+          <Formik
+            initialValues={{
+              comment: "",
+              picture: "",
+              category: "",
+              operator: "",
+              location: "",
+            }}
+            onSubmit={(values) => {
+              values.location = location;
+              values.operator = operator;
+              values.category = category;
+              values.picture = image;
+              if (
+                values.category &&
+                values.operator &&
+                values.location &&
+                values.picture
+              ) {
+                dispatch(addClaim(values));
+                console.log(values);
+                alert("Claim submitted successfully");
+              } else {
+                alert("Please fill in all fields");
+              }
+            }}
+          >
+            {(props) => (
+              <View style={styles.loginForm}>
+                <View style={styles.cameraWrapper}>
+                  {image ? (
+                    <View>
+                      <Image
+                        source={{ uri: image }}
+                        style={styles.capturedImage}
+                      />
+                      <View style={styles.deleteButtonContainer}>
                         <TouchableOpacity
-                          onPress={() => takePicture()}
-                          style={{
-                            width: 70,
-                            height: 70,
-                            bottom: 0,
-                            borderRadius: 50,
-                            backgroundColor: "#fff",
-                          }}
-                        />
+                          onPress={() => setImage(null)}
+                          style={styles.deleteButton}
+                        >
+                          <Ionicons name="trash" size={25} color="red" />
+                        </TouchableOpacity>
                       </View>
                     </View>
-                  </View>
-                )}
-              </View>
-              <View style={styles.border}>
-                <Picker
-                  selectedValue={category}
-                  onValueChange={(itemValue, itemIndex) =>
-                    setCategory(itemValue)
-                  }
-                  style={styles.inputSelector}
-                >
-                  <Picker.Item label="Select Category" value="" />
-                  {categories.map((item, index) => {
-                    return (
-                      <Picker.Item
-                        label={item.label}
-                        value={item.value}
-                        key={index}
+                  ) : (
+                    <View>
+                      <Camera
+                        style={styles.camera}
+                        type={CameraType.back}
+                        ratio={"1:1"}
+                        ref={(ref) => setCamera(ref)}
                       />
-                    );
-                  })}
-                </Picker>
-              </View>
-              <View style={styles.border}>
-                <Picker
-                  selectedValue={operator}
-                  onValueChange={(itemValue, itemIndex) =>
-                    setOperator(itemValue)
-                  }
-                  style={styles.inputSelector}
+                      <View style={styles.captureButtonContainer}>
+                        <TouchableOpacity
+                          onPress={() => takePicture()}
+                          style={styles.captureButton}
+                        >
+                          <Ionicons name="camera" size={30} color="#fff" />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  )}
+                </View>
+                <View style={styles.border}>
+                  <Picker
+                    selectedValue={category}
+                    onValueChange={(itemValue, itemIndex) =>
+                      setCategory(itemValue)
+                    }
+                    style={styles.inputSelector}
+                  >
+                    <Picker.Item label="Select Category" value="" />
+                    {categories.map((item, index) => {
+                      return (
+                        <Picker.Item
+                          label={item.label}
+                          value={item.value}
+                          key={index}
+                        />
+                      );
+                    })}
+                  </Picker>
+                </View>
+                <View style={styles.border}>
+                  <Picker
+                    selectedValue={operator}
+                    onValueChange={(itemValue, itemIndex) =>
+                      setOperator(itemValue)
+                    }
+                    style={styles.inputSelector}
+                  >
+                    <Picker.Item label="Select Operator" value="" />
+                    {operators.map((item, index) => {
+                      return (
+                        <Picker.Item
+                          label={item.label}
+                          value={item.value}
+                          key={index}
+                        />
+                      );
+                    })}
+                  </Picker>
+                </View>
+
+                <TextInput
+                  style={styles.hiddenField}
+                  onChangeText={props.handleChange("location")}
+                  value={props.values.location}
+                />
+                <TextInput
+                  multiline
+                  style={styles.inputComment}
+                  placeholder="Comment"
+                  onChangeText={props.handleChange("comment")}
+                  value={props.values.comment}
+                />
+                <TouchableOpacity
+                  style={styles.LoginButton}
+                  onPress={props.handleSubmit}
                 >
-                  <Picker.Item label="Select Operator" value="" />
-                  {operators.map((item, index) => {
-                    return (
-                      <Picker.Item
-                        label={item.label}
-                        value={item.value}
-                        key={index}
-                      />
-                    );
-                  })}
-                </Picker>
+                  <Text style={styles.loginTestButton}>Submit</Text>
+                </TouchableOpacity>
               </View>
-              <TextInput
-                multiline
-                style={styles.inputComment}
-                placeholder="Comment"
-                onChangeText={props.handleChange("comment")}
-                value={props.values.comment}
-              />
-              <TouchableOpacity
-                style={styles.LoginButton}
-                onPress={props.handleSubmit}
-              >
-                <Text style={styles.loginTestButton}>Submit</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-        </Formik>
-      </View>
-    </DismissKeyboard>
+            )}
+          </Formik>
+        </View>
+      </DismissKeyboard>
+    </ScrollView>
   );
 };
 

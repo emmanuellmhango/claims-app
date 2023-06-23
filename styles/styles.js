@@ -12,6 +12,15 @@ export const styles = StyleSheet.create({
     height: "100%",
     marginTop: 0,
   },
+  deleteButton: {
+    alignContent: "flex-end",
+    alignItems: "flex-end",
+  },
+  deleteButtonContainer: {
+    position: "absolute",
+    top: 5,
+    right: 5,
+  },
   cameraWrapper: {
     borderWidth: 1,
     borderColor: "#ddd",
@@ -20,10 +29,35 @@ export const styles = StyleSheet.create({
     width: "90%",
     height: "50%",
   },
+  capturedImage: {
+    width: "100%",
+    height: "100%",
+    resizeMode: "cover",
+  },
+  captureButtonContainer: {
+    position: "absolute",
+    bottom: 10,
+    alignSelf: "center",
+  },
+  captureButton: {
+    backgroundColor: "coral",
+    padding: 15,
+    borderRadius: 50,
+  },
+  hiddenField: {
+    display: "none",
+  },
   mapLoading: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+  },
+  claimContainer: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  claimWrapper: {
+    backgroundColor: "#fff",
   },
   wrapper: {
     flex: 1,
