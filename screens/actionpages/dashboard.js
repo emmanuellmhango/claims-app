@@ -37,7 +37,11 @@ const DashBoard = ({ navigation }) => {
   }, []);
 
   const openModal = () => {
-    setModalVisible(!modalVisible);
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
   };
 
   const convertKeysToString = (data) => {
@@ -85,7 +89,7 @@ const DashBoard = ({ navigation }) => {
   };
 
   const handleAddButtonPress = () => {
-    navigation.navigate("MakeClaim");
+    navigation.navigate("ClaimOne");
   };
 
   const handleMapLoad = () => {
@@ -148,6 +152,12 @@ const DashBoard = ({ navigation }) => {
         {/* Bottom analytics modal */}
         <Modal animationType="slide" transparent={true} visible={modalVisible}>
           <View style={styles.modal}>
+            <TouchableOpacity
+              onPress={closeModal}
+              style={[styles.button, styles.buttonClose]}
+            >
+              <Text style={styles.white}>X</Text>
+            </TouchableOpacity>
             <View style={styles.analytics}>
               <MaterialCommunityIcons
                 name="google-analytics"

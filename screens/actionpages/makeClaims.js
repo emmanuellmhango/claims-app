@@ -8,10 +8,10 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   ScrollView,
+  ImageBackground,
 } from "react-native";
 import { Formik } from "formik";
 import { Picker } from "@react-native-picker/picker";
-import { Camera, CameraType } from "expo-camera";
 import * as Location from "expo-location";
 import { Ionicons } from "@expo/vector-icons";
 import { useDispatch } from "react-redux";
@@ -24,14 +24,13 @@ const DismissKeyboard = ({ children }) => (
   </TouchableWithoutFeedback>
 );
 
-const MakeClaim = () => {
+const MakeClaim = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const [category, setCategory] = useState("");
   const [operator, setOperator] = useState("");
-  const [hasCameraPermission, setHasCameraPermission] = useState(null);
   const [image, setImage] = useState(null);
-  const [camera, setCamera] = useState(null);
   const [location, setLocation] = useState(null);
+  const { images } = route.params;
 
   useEffect(() => {
     getLocationAsync();
@@ -50,24 +49,6 @@ const MakeClaim = () => {
       console.log("Error retrieving location:", error);
     }
   };
-
-  useEffect(() => {
-    (async () => {
-      const cameraStatus = await Camera.requestCameraPermissionsAsync();
-      setHasCameraPermission(cameraStatus.status === "granted");
-    })();
-  }, []);
-
-  const takePicture = async () => {
-    if (camera) {
-      const data = await camera.takePictureAsync(null);
-      setImage(data.uri);
-    }
-  };
-
-  if (hasCameraPermission === false) {
-    return <Text>No access to camera</Text>;
-  }
 
   const categories = [
     { label: "Apple", value: "apple" },
@@ -123,40 +104,16 @@ const MakeClaim = () => {
             >
               {(props) => (
                 <View style={styles.loginForm}>
-                  <View style={styles.cameraWrapper}>
-                    {image ? (
-                      <View>
-                        <Image
-                          source={{ uri: image }}
-                          style={styles.capturedImage}
-                        />
-                        <View style={styles.deleteButtonContainer}>
-                          <TouchableOpacity
-                            onPress={() => setImage(null)}
-                            style={styles.deleteButton}
-                          >
-                            <Ionicons name="trash" size={25} color="red" />
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-                    ) : (
-                      <View>
-                        <Camera
-                          style={styles.camera}
-                          type={CameraType.back}
-                          ratio={"1:1"}
-                          ref={(ref) => setCamera(ref)}
-                        />
-                        <View style={styles.captureButtonContainer}>
-                          <TouchableOpacity
-                            onPress={() => takePicture()}
-                            style={styles.captureButton}
-                          >
-                            <Ionicons name="camera" size={30} color="#fff" />
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-                    )}
+                  <View style={styles.imagesClaimSubmit}>
+                    {images &&
+                      images.map((image, index) => {
+                        <View style={styles.imagesClaimSubmit} key={index}>
+                          <Image
+                            source={{ uri: image }}
+                            style={styles.capturedImage}
+                          />
+                        </View>;
+                      })}
                   </View>
                   <View style={styles.border}>
                     <Picker

@@ -31,7 +31,7 @@ const Login = ({ navigation }) => {
             initialValues={{ email: "", password: "" }}
             onSubmit={(values) => {
               if (values.email === "Admin" && values.password == "admin") {
-                navigation.navigate("Dashboard");
+                navigation.navigate("ClaimOne");
               } else {
                 alert("Invalid Credentials");
               }

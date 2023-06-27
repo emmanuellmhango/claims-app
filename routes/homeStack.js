@@ -1,12 +1,13 @@
 import { createStackNavigator } from "react-navigation-stack";
 import { createAppContainer } from "react-navigation";
 import { Ionicons } from "@expo/vector-icons";
-import { TouchableOpacity } from "react-native";
+import { TouchableOpacity, Text } from "react-native";
 import Home from "../screens/startscreens/home";
 import Login from "../screens/accessibility/login";
 import Signup from "../screens/accessibility/signup";
 import Dashboard from "../screens/actionpages/dashboard";
-import MakeClaim from "../screens/actionpages/makeClaims";
+import ClaimOne from "../screens/actionpages/claimOne";
+import ClaimTwo from "../screens/actionpages/claimTwo";
 import { styles } from "../styles/styles";
 
 const CustomBackArrow = ({ onPress }) => (
@@ -56,8 +57,24 @@ const screens = {
       headerLeft: () => <CustomBackArrow onPress={() => navigation.goBack()} />,
     }),
   },
-  MakeClaim: {
-    screen: MakeClaim,
+  ClaimOne: {
+    screen: ClaimOne,
+    navigationOptions: ({ navigation }) => ({
+      title: "Claim",
+      headerStyle: {
+        backgroundColor: "#612cfe",
+      },
+      headerTitleStyle: {
+        fontWeight: "bold",
+        color: "#fff",
+        textAlign: "center",
+      },
+      headerLeft: () => <CustomBackArrow onPress={() => navigation.goBack()} />,
+      headerRight: () => <Text> {/* */} </Text>,
+    }),
+  },
+  ClaimTwo: {
+    screen: ClaimTwo,
     navigationOptions: ({ navigation }) => ({
       title: "Claim",
       headerStyle: {
@@ -70,7 +87,7 @@ const screens = {
       },
       headerLeft: () => <CustomBackArrow onPress={() => navigation.goBack()} />,
       headerRight: () => (
-        <CustomMenuIcon onPress={() => alert("Claim History")} />
+        <CustomLogoutArrow onPress={() => navigation.goBack()} />
       ),
     }),
   },
