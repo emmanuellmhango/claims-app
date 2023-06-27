@@ -7,6 +7,7 @@ import {
   Image,
   TouchableWithoutFeedback,
   Keyboard,
+  ImageBackground,
 } from "react-native";
 import { Formik } from "formik";
 import { styles } from "../../styles/styles";
@@ -21,55 +22,68 @@ const Login = ({ navigation }) => {
   return (
     <DismissKeyboard>
       <View style={styles.loginWrapper}>
-        <Formik
-          initialValues={{ email: "", password: "" }}
-          onSubmit={(values) => {
-            if (values.email === "admin" && values.password == "admin") {
-              navigation.navigate("Dashboard");
-            } else {
-              alert("Invalid Credentials");
-            }
-          }}
+        <ImageBackground
+          source={require("../../assets/bg.png")}
+          resizeMode="cover"
+          style={styles.image}
         >
-          {(props) => (
-            <View style={styles.loginForm}>
-              <Image
-                style={styles.loginLogo}
-                source={require("../../assets/logo.png")}
-              />
-              <Text style={styles.loginTitle}>Login</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Email"
-                onChangeText={props.handleChange("email")}
-                value={props.values.email}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Password"
-                secureTextEntry={true}
-                onChangeText={props.handleChange("password")}
-                value={props.values.password}
-              />
-              <TouchableOpacity
-                style={styles.LoginButton}
-                onPress={props.handleSubmit}
-              >
-                <Text style={styles.loginTestButton}>Login</Text>
-              </TouchableOpacity>
+          <Formik
+            initialValues={{ email: "", password: "" }}
+            onSubmit={(values) => {
+              if (values.email === "Admin" && values.password == "admin") {
+                navigation.navigate("Dashboard");
+              } else {
+                alert("Invalid Credentials");
+              }
+            }}
+          >
+            {(props) => (
+              <View style={styles.loginForm}>
+                <Image
+                  source={require("../../assets/logo.png")}
+                  style={styles.logo}
+                />
+                <Text style={styles.textLeft}>Email</Text>
+                <TextInput
+                  style={styles.input}
+                  onChangeText={props.handleChange("email")}
+                  value={props.values.email}
+                />
+                <Text style={styles.textLeft}>Password</Text>
+                <TextInput
+                  style={styles.input}
+                  secureTextEntry={true}
+                  onChangeText={props.handleChange("password")}
+                  value={props.values.password}
+                />
+                <View style={styles.forgotDiv}>
+                  <Text style={styles.loginForgotPassword}>
+                    Forgot Password?
+                  </Text>
+                </View>
+                <TouchableOpacity
+                  style={styles.loginBtn}
+                  onPress={props.handleSubmit}
+                >
+                  <Text style={styles.getStartedText}>Sign in</Text>
+                </TouchableOpacity>
 
-              <View style={styles.forgotDiv}>
-                <Text style={styles.loginForgotPassword}>Forgot Password?</Text>
+                <View style={styles.bottomDiv}>
+                  <TouchableOpacity
+                    onPress={() => navigation.navigate("Signup")}
+                  >
+                    <Text style={styles.signupTextFromLogin}>
+                      New Account? Sign up
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-            </View>
-          )}
-        </Formik>
-
-        <View style={styles.bottomDiv}>
-          <TouchableOpacity onPress={() => navigation.navigate("Signup")}>
-            <Text style={styles.signupTextFromLogin}>Sign up</Text>
-          </TouchableOpacity>
-        </View>
+            )}
+          </Formik>
+          <View style={styles.bottomSpace}>
+            <Text style={styles.bottomText}>{/* */}</Text>
+          </View>
+        </ImageBackground>
       </View>
     </DismissKeyboard>
   );
