@@ -23,7 +23,7 @@ export const styles = StyleSheet.create({
     borderColor: "#ddd",
     marginBottom: 10,
     margin: 0,
-    width: "100%",
+    width: "90%",
     height: "40%",
   },
   cameraWrapper: {
@@ -42,6 +42,12 @@ export const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     resizeMode: "cover",
+  },
+  capturedImageClaim: {
+    width: "50%",
+    height: "50%",
+    resizeMode: "contain",
+    aspectRatio: 1,
   },
   captureButtonContainer: {
     position: "absolute",
@@ -172,8 +178,11 @@ export const styles = StyleSheet.create({
   buttonOpen: {
     backgroundColor: "#fff",
   },
+  black: {
+    color: "#000",
+  },
   buttonClose: {
-    backgroundColor: "maroon",
+    backgroundColor: "#fff",
   },
   white: {
     color: "#fff",

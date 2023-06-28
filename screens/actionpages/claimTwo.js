@@ -44,6 +44,7 @@ const ClaimTwo = ({ route, navigation }) => {
     if (camera) {
       const data = await camera.takePictureAsync(null);
       setImage(data.uri);
+      setPictures((prevPictures) => [...prevPictures, data.uri]);
     }
   };
 
@@ -67,7 +68,6 @@ const ClaimTwo = ({ route, navigation }) => {
               onSubmit={(values) => {
                 values.pictureA = image;
                 if (values.pictureA) {
-                  setPictures((prevPictures) => [...prevPictures, image]);
                   navigation.navigate("MakeClaim", {
                     images: pictures,
                   });

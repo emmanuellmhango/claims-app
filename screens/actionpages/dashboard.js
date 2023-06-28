@@ -101,7 +101,7 @@ const DashBoard = ({ navigation }) => {
       <View style={styles.headerContainer}>
         <View style={styles.header}>
           <Text>{/* */}</Text>
-          <Text style={styles.headerTitle}>Dashboard</Text>
+          <Text style={styles.headerTitle}>Home</Text>
           <View style={styles.rightIconContainer}>
             <TouchableOpacity onPress={openModal}>
               <Ionicons
@@ -156,7 +156,7 @@ const DashBoard = ({ navigation }) => {
               onPress={closeModal}
               style={[styles.button, styles.buttonClose]}
             >
-              <Text style={styles.white}>X</Text>
+              <Text style={styles.black}>X</Text>
             </TouchableOpacity>
             <View style={styles.analytics}>
               <MaterialCommunityIcons
