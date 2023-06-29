@@ -60,7 +60,6 @@ const ClaimOne = ({ navigation }) => {
                 values.pictureA = image;
                 if (values.pictureA) {
                   navigation.navigate("ClaimTwo", {
-                    id: 1,
                     imageA: image,
                   });
                 } else {

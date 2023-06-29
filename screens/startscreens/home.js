@@ -18,13 +18,13 @@ const Home = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={styles.startContainer}>
       <ImageBackground
         source={require("../../assets/bg.png")}
         resizeMode="cover"
         style={styles.image}
       >
-        <View style={styles.wrapper}>
+        <View style={styles.startWrapper}>
           <Image
             source={require("../../assets/logo.png")}
             style={styles.logo}

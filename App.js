@@ -10,6 +10,8 @@ import ClaimOne from "./screens/actionpages/claimOne";
 import ClaimTwo from "./screens/actionpages/claimTwo";
 import CustomBackArrow from "./screens/actionpages/backarrow";
 import MakeClaim from "./screens/actionpages/makeClaims";
+import Explore from "./screens/actionpages/explore";
+import ViewMap from "./screens/actionpages/viewmap";
 import { Provider } from "react-redux";
 import store from "./state/store";
 
@@ -104,8 +106,33 @@ function App() {
             }}
           />
           <Stack.Screen
+            name="ViewMap"
+            component={ViewMap}
+            options={{
+              title: "View On Map",
+              headerStyle: {
+                backgroundColor: "#612cfe",
+              },
+              headerTitleStyle: {
+                fontWeight: "bold",
+                color: "#fff",
+                textAlign: "center",
+              },
+              headerTitleAlign: "center",
+              headerLeft: () => <CustomBackArrow />,
+              headerRight: () => <Text> {/* */} </Text>,
+            }}
+          />
+          <Stack.Screen
             name="Dashboard"
             component={Dashboard}
+            options={{
+              headerShown: false,
+            }}
+          />
+          <Stack.Screen
+            name="Explore"
+            component={Explore}
             options={{
               headerShown: false,
             }}

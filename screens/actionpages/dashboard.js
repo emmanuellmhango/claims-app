@@ -1,62 +1,23 @@
 import React, { useEffect, useState } from "react";
-import * as Location from "expo-location";
-import MapView, { Marker } from "react-native-maps";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Modal,
-  Pressable,
-  TextInput,
-  Image,
-  ScrollView,
-} from "react-native";
+import { View, Text, TouchableOpacity, TextInput } from "react-native";
 import { useSelector } from "react-redux";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { styles } from "../../styles/styles";
+import AllClaims from "./allclaims";
 
 const DashBoard = ({ navigation }) => {
   const claimsAll = useSelector((state) => state.claims.claims);
-  const [location, setLocation] = useState(null);
-  const [claims, setClaims] = useState(null);
-  const defaultZoomLevel = 0.01;
-  const [isMapLoaded, setIsMapLoaded] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
   const [weeklyClaims, setWeeklyClaims] = useState("");
   const [topCategory, setTopCategory] = useState("");
 
   useEffect(() => {
-    getLocationAsync();
-  }, []);
-
-  useEffect(() => {
     if (claimsAll) {
-      convertKeysToString(claimsAll);
       findMostOccurringCategory(claimsAll);
     }
-  }, []);
+  }, [claimsAll]);
 
-  const openModal = () => {
-    setModalVisible(true);
-  };
-
-  const closeModal = () => {
-    setModalVisible(false);
-  };
-
-  const convertKeysToString = (data) => {
-    const transformedData = data.map((item) => {
-      const { category, comment, location, operator, picture } = item;
-      return {
-        [category]: category,
-        [comment]: comment,
-        ...location,
-        [operator]: operator,
-        picture: picture,
-      };
-    });
-    setWeeklyClaims(`Weekly Claims: ${transformedData.length}`);
-    setClaims(transformedData);
+  const handleAddButtonPress = () => {
+    navigation.navigate("ClaimOne");
   };
 
   const findMostOccurringCategory = (data) => {
@@ -75,220 +36,66 @@ const DashBoard = ({ navigation }) => {
         mostOccurringCategory = category;
       }
     }
+    setWeeklyClaims(`Weekly Claims: ${data.length}`);
     setTopCategory(`Top Category: ${mostOccurringCategory || "--"}`);
   };
 
-  const getLocationAsync = async () => {
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      console.log("Permission to access location was denied");
-      return;
-    }
-    const currentLocation = await Location.getCurrentPositionAsync({});
-    setLocation(currentLocation.coords);
-  };
-
-  const handleAddButtonPress = () => {
-    navigation.navigate("ClaimOne");
-  };
-
-  const handleMapLoad = () => {
-    setIsMapLoaded(true);
+  const openModal = () => {
+    navigation.navigate("Explore");
   };
 
   return (
     <View style={styles.wrapper}>
       <View style={styles.headerContainer}>
         <View style={styles.header}>
-          <Text>{/* */}</Text>
-          <Text style={styles.headerTitle}>Home</Text>
+          <Text style={styles.headerTitle}>About</Text>
+          <Text style={styles.headerTitleActive}>Home</Text>
           <View style={styles.rightIconContainer}>
             <TouchableOpacity onPress={openModal}>
-              <Ionicons
-                name="md-menu-sharp"
-                size={28}
-                style={styles.rightIcon}
-              />
+              <Text style={styles.headerTitle}>Explore</Text>
             </TouchableOpacity>
           </View>
         </View>
       </View>
-      <View style={styles.mapContainer}>
-        {location ? (
-          <MapView
-            style={styles.map}
-            initialRegion={{
-              latitude: location.latitude,
-              longitude: location.longitude,
-              latitudeDelta: defaultZoomLevel,
-              longitudeDelta: defaultZoomLevel,
-            }}
-            onMapReady={handleMapLoad}
-          >
-            <Marker
-              coordinate={{
-                latitude: location.latitude,
-                longitude: location.longitude,
-              }}
-              title="My Location"
-            />
-            {claims &&
-              Object.values(claims).map((claim, index) => (
-                <Marker
-                  key={index}
-                  coordinate={{
-                    latitude: claim.latitude,
-                    longitude: claim.longitude,
-                  }}
-                  title={claim.title}
-                />
-              ))}
-          </MapView>
+      <View style={styles.cameraIcon}>
+        <TouchableOpacity onPress={handleAddButtonPress}>
+          <Ionicons name="camera" style={styles.cameraIconStyling} />
+        </TouchableOpacity>
+      </View>
+      <View style={styles.claimsContainer}>
+        {claimsAll?.length < 1 || claimsAll === null ? (
+          <View style={styles.NoContentFlyItemContainer}>
+            <Text style={styles.NoClaimsFlyText}>No Claims Yet</Text>
+          </View>
         ) : (
-          <View style={styles.mapLoading}>
-            <Text>Loading...</Text>
-          </View>
+          <AllClaims claims={claimsAll} />
         )}
-        {/* Bottom analytics modal */}
-        <Modal animationType="slide" transparent={true} visible={modalVisible}>
-          <View style={styles.modal}>
-            <TouchableOpacity
-              onPress={closeModal}
-              style={[styles.button, styles.buttonClose]}
-            >
-              <Text style={styles.black}>X</Text>
-            </TouchableOpacity>
-            <View style={styles.analytics}>
-              <MaterialCommunityIcons
-                name="google-analytics"
-                size={28}
-                style={styles.analyticsIcon}
-              />
-              <TextInput style={styles.inputModal} value={weeklyClaims} />
-            </View>
-            <View style={styles.topCategory}>
-              <Ionicons
-                name="ios-grid-outline"
-                size={28}
-                style={styles.analyticsIcon}
-              />
-              <TextInput style={styles.inputModal} value={topCategory} />
-            </View>
-          </View>
-        </Modal>
-        {/* Sticky flying modal */}
-        <Modal animationType="slide" transparent={true} visible={modalVisible}>
-          <View style={styles.modalFly}>
-            <Text style={styles.flyTitle}>Claims History</Text>
-            <View style={styles.flyContainer}>
-              <ScrollView>
-                <View style={styles.flyItem}>
-                  <View style={styles.flyImageContainer}>
-                    <Image
-                      source={require("../../assets/image_uploads/pothole.jpg")}
-                      style={styles.flyImage}
-                      resizeMode="contain"
-                    />
-                  </View>
-                  <View style={styles.flyTextContainer}>
-                    <Text style={styles.flyText}>Broken water pipe</Text>
-                    <Text style={styles.flyText}>10/10/2021</Text>
-                  </View>
-                </View>
-                <View style={styles.flyItem}>
-                  <View style={styles.flyImageContainer}>
-                    <Image
-                      source={require("../../assets/image_uploads/pothole.jpg")}
-                      style={styles.flyImage}
-                      resizeMode="contain"
-                    />
-                  </View>
-                  <View style={styles.flyTextContainer}>
-                    <Text style={styles.flyText}>Broken water pipe</Text>
-                    <Text style={styles.flyText}>10/10/2021</Text>
-                  </View>
-                </View>
-                <View style={styles.flyItem}>
-                  <View style={styles.flyImageContainer}>
-                    <Image
-                      source={require("../../assets/image_uploads/pothole.jpg")}
-                      style={styles.flyImage}
-                      resizeMode="contain"
-                    />
-                  </View>
-                  <View style={styles.flyTextContainer}>
-                    <Text style={styles.flyText}>Broken water pipe</Text>
-                    <Text style={styles.flyText}>10/10/2021</Text>
-                  </View>
-                </View>
-                <View style={styles.flyItem}>
-                  <View style={styles.flyImageContainer}>
-                    <Image
-                      source={require("../../assets/image_uploads/pothole.jpg")}
-                      style={styles.flyImage}
-                      resizeMode="contain"
-                    />
-                  </View>
-                  <View style={styles.flyTextContainer}>
-                    <Text style={styles.flyText}>Broken water pipe</Text>
-                    <Text style={styles.flyText}>10/10/2021</Text>
-                  </View>
-                </View>
-                <View style={styles.flyItem}>
-                  <View style={styles.flyImageContainer}>
-                    <Image
-                      source={require("../../assets/image_uploads/pothole.jpg")}
-                      style={styles.flyImage}
-                      resizeMode="contain"
-                    />
-                  </View>
-                  <View style={styles.flyTextContainer}>
-                    <Text style={styles.flyText}>Broken water pipe</Text>
-                    <Text style={styles.flyText}>10/10/2021</Text>
-                  </View>
-                </View>
-                <View style={styles.flyItem}>
-                  <View style={styles.flyImageContainer}>
-                    <Image
-                      source={require("../../assets/image_uploads/pothole.jpg")}
-                      style={styles.flyImage}
-                      resizeMode="contain"
-                    />
-                  </View>
-                  <View style={styles.flyTextContainer}>
-                    <Text style={styles.flyText}>Broken water pipe</Text>
-                    <Text style={styles.flyText}>10/10/2021</Text>
-                  </View>
-                </View>
-                <View style={styles.flyItem}>
-                  <View style={styles.flyImageContainer}>
-                    <Image
-                      source={require("../../assets/image_uploads/pothole.jpg")}
-                      style={styles.flyImage}
-                      resizeMode="contain"
-                    />
-                  </View>
-                  <View style={styles.flyTextContainer}>
-                    <Text style={styles.flyText}>Broken water pipe</Text>
-                    <Text style={styles.flyText}>10/10/2021</Text>
-                  </View>
-                </View>
-              </ScrollView>
-            </View>
-          </View>
-        </Modal>
       </View>
-
-      {isMapLoaded && (
-        <View style={styles.addButtonContainer}>
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={handleAddButtonPress}
-          >
-            <Ionicons name="add-circle" size={60} style={styles.addArrow} />
-          </TouchableOpacity>
+      <View style={styles.modal}>
+        <View style={styles.analytics}>
+          <MaterialCommunityIcons
+            name="google-analytics"
+            size={28}
+            style={styles.analyticsIcon}
+          />
+          <TextInput style={styles.inputModal} value={weeklyClaims} />
         </View>
-      )}
+        <View style={styles.topCategory}>
+          <Ionicons
+            name="ios-grid-outline"
+            size={28}
+            style={styles.analyticsIcon}
+          />
+          <TextInput style={styles.inputModal} value={topCategory} />
+        </View>
+        <View style={styles.topCategory}>
+          <View style={styles.instructionsView}>
+            <Text style={styles.instruction}>
+              To make a claim, press the Taget button
+            </Text>
+          </View>
+        </View>
+      </View>
     </View>
   );
 };

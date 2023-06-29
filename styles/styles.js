@@ -1,8 +1,17 @@
-import { StyleSheet } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
+const windowWidth = Dimensions.get("window").width;
+const windowHeight = Dimensions.get("window").height;
+
+const calloutWidthPercentage = 75;
+const calloutHeightPercentage = 40;
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  startContainer: {
+    flex: 1,
+    justifyContent: "center",
   },
   camera: {
     width: "100%",
@@ -18,13 +27,20 @@ export const styles = StyleSheet.create({
     top: 5,
     right: 5,
   },
-  imagesClaimSubmit: {
+  imagesClaimSubmitContainer: {
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: "#5e2bff",
     marginBottom: 10,
-    margin: 0,
+    marginTop: 10,
     width: "90%",
-    height: "40%",
+    borderRadius: 6,
+    flexDirection: "row",
+  },
+  imagesClaimSubmit: {
+    margin: 0,
+    width: "50%",
+    borderRadius: 6,
+    aspectRatio: 1,
   },
   cameraWrapper: {
     borderWidth: 1,
@@ -44,10 +60,15 @@ export const styles = StyleSheet.create({
     resizeMode: "cover",
   },
   capturedImageClaim: {
-    width: "50%",
-    height: "50%",
+    width: "100%",
+    height: "100%",
     resizeMode: "contain",
     aspectRatio: 1,
+  },
+  capturedImageClaimMap: {
+    width: 100,
+    height: 100,
+    resizeMode: "contain",
   },
   captureButtonContainer: {
     position: "absolute",
@@ -101,6 +122,14 @@ export const styles = StyleSheet.create({
   claimWrapper: {
     backgroundColor: "#fff",
   },
+  makeClaimWrapper: {
+    justifyContent: "center",
+  },
+  startWrapper: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
   wrapper: {
     flex: 1,
     alignItems: "center",
@@ -117,17 +146,43 @@ export const styles = StyleSheet.create({
     fontSize: 16,
   },
   logo: {
-    width: "40%",
-    height: "30%",
+    width: "50%",
+    height: "40%",
     resizeMode: "contain",
     marginBottom: 20,
   },
   headerTitle: {
+    color: "#cfd1cf",
+    fontWeight: "bold",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: 18,
+  },
+  headerTitleActive: {
     color: "#fff",
     fontWeight: "bold",
     alignItems: "center",
     justifyContent: "center",
     fontSize: 20,
+    textDecorationLine: "Underline",
+  },
+  claimsContainer: {
+    width: "100%",
+    height: "66%",
+    position: "relative",
+  },
+  cameraIcon: {
+    backgroundColor: "#612cfe",
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingBottom: 8,
+    borderRadius: 15,
+    position: "absolute",
+    top: "12%",
+  },
+  cameraIconStyling: {
+    color: "#fff",
+    fontSize: 30,
   },
   leftIcon: {
     marginLeft: 10,
@@ -135,8 +190,8 @@ export const styles = StyleSheet.create({
   },
   modal: {
     width: "100%",
-    height: "20%",
-    backgroundColor: "#5E2BFF",
+    height: "24%",
+    backgroundColor: "#5e2bff",
     position: "absolute",
     bottom: 0,
     left: 0,
@@ -144,25 +199,22 @@ export const styles = StyleSheet.create({
     paddingTop: 20,
     alignItems: "center",
     justifyContent: "center",
-    borderTopLeftRadius: 25,
-    borderTopRightRadius: 25,
   },
   modalFly: {
-    width: "60%",
-    height: "40%",
-    backgroundColor: "#5E2BFF",
-    position: "absolute",
-    top: "10%",
-    right: 20,
-    borderRadius: 25,
+    width: "100%",
+    height: "100%",
   },
   headerContainer: {
-    height: "13%",
     width: "100%",
-    backgroundColor: "#612cfe",
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    height: "14%",
+    backgroundColor: "#5E2BFF",
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    paddingTop: 20,
+    alignItems: "flex-end",
+    justifyContent: "center",
   },
   button: {
     borderRadius: 20,
@@ -192,6 +244,16 @@ export const styles = StyleSheet.create({
     fontWeight: "bold",
     marginRight: 10,
   },
+  instructionsView: {
+    padding: 6,
+    borderColor: "#fff",
+    borderWidth: 1,
+    borderRadius: 10,
+  },
+  instruction: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
   analytics: {
     flexDirection: "row",
     alignItems: "center",
@@ -210,15 +272,54 @@ export const styles = StyleSheet.create({
   },
   header: {
     width: "100%",
-    backgroundColor: "#612cfe",
     flexDirection: "row",
     alignItems: "flex-end",
     justifyContent: "space-between",
     paddingVertical: 10,
+    paddingLeft: 10,
+    paddingRight: 10,
+    borderBottomColor: "#cfd1cf",
+    borderBottomWidth: 2,
+  },
+  explore: {
+    color: "#fff",
+    fontWeight: "bold",
   },
   mapContainer: {
-    height: "87%",
+    height: "83%",
     width: "100%",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  calloutContainer: {
+    padding: 5,
+    backgroundColor: "#5e2bff",
+    borderRadius: 8,
+    width: (windowWidth * calloutWidthPercentage) / 100,
+    height: (windowHeight * calloutHeightPercentage) / 100,
+  },
+  calloutTitle: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  calloutDescription: {
+    fontSize: 14,
+  },
+  containinerLoading: {
+    height: "100%",
+    width: "100%",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  mapContainerClaim: {
+    height: "100%",
+    width: "100%",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
   logoHeader: {
     flex: 1,
@@ -274,6 +375,14 @@ export const styles = StyleSheet.create({
     color: "#fff",
     fontWeight: "bold",
   },
+  textLeftClaimMarker: {
+    textAlign: "left",
+    width: "80%",
+    marginLeft: 5,
+    marginBottom: 3,
+    color: "#fff",
+    fontSize: 12,
+  },
   loginBtn: {
     width: "50%",
     backgroundColor: "#fff",
@@ -282,6 +391,15 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 20,
+  },
+  loginBtnClaim: {
+    width: "50%",
+    backgroundColor: "#5e2bff",
+    borderRadius: 27,
+    height: 35,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20,
   },
   addButtonContainer: {
     position: "absolute",
@@ -312,8 +430,8 @@ export const styles = StyleSheet.create({
   flyTitle: {
     justifyContent: "center",
     textAlign: "center",
-    color: "#fff",
-    fontWeight: "bold",
+    color: "#5E2bff",
+    fontSize: 20,
     marginTop: 5,
   },
   flyContainer: {
@@ -325,36 +443,53 @@ export const styles = StyleSheet.create({
     width: "95%",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#6d3dfc",
-    borderRadius: 10,
-    margin: 5,
-    //height: 60,
     flexDirection: "row",
-    paddingBottom: 10,
     maxHeight: "100%",
   },
+  flyItemContainer: {
+    width: "100%",
+    borderColor: "#cfd1cf",
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    alignItems: "center",
+  },
+  NoContentFlyItemContainer: {
+    width: "100%",
+    alignItems: "center",
+    height: "100%",
+    justifyContent: "center",
+  },
   flyImageContainer: {
-    width: "30%",
+    width: "20%",
     marginRight: 3,
     aspectRatio: 1,
   },
   flyImage: {
     flex: 1,
-    width: "30%",
+    width: "20%",
     aspectRatio: 1,
     borderRadius: 6,
     width: undefined,
     height: undefined,
+    margin: 5,
   },
   flyTextContainer: {
-    width: "70%",
-    height: 60,
+    width: "100%",
     flexDirection: "column",
-    justifyContent: "space-between",
     alignItems: "flex-start",
+    paddingLeft: 10,
   },
   flyText: {
-    color: "#fff",
+    color: "#5E2bff",
+    fontSize: 16,
+  },
+  flyTextClaims: {
+    color: "#5E2bff",
+    fontSize: 12,
+  },
+  NoClaimsFlyText: {
+    color: "#5E2bff",
+    fontSize: 16,
   },
   input: {
     borderWidth: 1,
@@ -372,10 +507,38 @@ export const styles = StyleSheet.create({
     paddingLeft: 10,
     borderRadius: 9,
     marginBottom: 10,
-    backgroundColor: "#fff",
+    backgroundColor: "#5E2bff",
     width: "80%",
     height: 32,
     fontWeight: "bold",
+    color: "#fff",
+  },
+  inputModalClaimMarker: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    paddingLeft: 10,
+    borderRadius: 9,
+    marginBottom: 5,
+    backgroundColor: "#5e2bff",
+    width: "40%",
+    height: 25,
+    color: "#fff",
+    fontSize: 12,
+  },
+  inputModalClaimComment: {
+    borderWidth: 1,
+    borderColor: "#ddd",
+    paddingLeft: 10,
+    borderRadius: 9,
+    marginBottom: 5,
+    backgroundColor: "#5e2bff",
+    width: "100%",
+    color: "#fff",
+    fontSize: 12,
+  },
+  markerGoup: {
+    flexDirection: "row",
+    width: "80%",
   },
   dobContainer: {
     flexDirection: "row",
@@ -493,16 +656,25 @@ export const styles = StyleSheet.create({
   },
   border: {
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: "#5e2bff",
     marginBottom: 5,
     margin: 0,
     width: "90%",
+    borderRadius: 6,
   },
   inputComment: {
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: "#5e2bff",
     padding: 10,
     marginTop: 0,
     width: "90%",
+    borderRadius: 6,
+  },
+  textLeftClaim: {
+    textAlign: "left",
+    width: "90%",
+    marginBottom: 3,
+    color: "#5e2bff",
+    fontWeight: "bold",
   },
 });
