@@ -8,9 +8,39 @@ import {
   ImageBackground,
 } from "react-native";
 import { Formik } from "formik";
+import axios from "axios";
 import { styles } from "../../styles/styles";
+import URL from "../../state/url";
 
 const Signup = ({ navigation }) => {
+  const handleSignup = async (values) => {
+    const dob = `${values.dd}/${values.mm}/${values.yy}`;
+    const data = {
+      user: {
+        name: values.name,
+        email: values.email,
+        password: values.password,
+        phone: values.phone,
+        dob: dob,
+      },
+    };
+    try {
+      const response = await axios.post(URL, data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (response.data.code === 2200) {
+        alert("You have successfully signed up. Please login to continue.");
+        navigation.navigate("Login");
+      } else {
+        alert("Oops!. Seems there was an error. Please try again");
+      }
+    } catch (error) {
+      console.log(error.response.data);
+    }
+  };
+
   return (
     <View style={styles.loginWrapper}>
       <ImageBackground
@@ -28,9 +58,18 @@ const Signup = ({ navigation }) => {
             mm: "",
             yy: "",
           }}
-          onSubmit={(values) => {
-            console.log(values);
+          validate={(values) => {
+            const errors = {};
+
+            if (!values.name) {
+              errors.name = "Name is required"; // Set the error message if the name field is empty
+            }
+
+            // ...perform additional validations for other fields if needed
+
+            return errors;
           }}
+          onSubmit={handleSignup}
         >
           {(props) => (
             <View style={styles.loginForm}>
@@ -43,6 +82,7 @@ const Signup = ({ navigation }) => {
                 style={styles.input}
                 onChangeText={props.handleChange("name")}
                 value={props.values.name}
+                onBlur={props.handleBlur("name")}
               />
               <Text style={styles.textLeft}>Email</Text>
               <TextInput
@@ -104,7 +144,7 @@ const Signup = ({ navigation }) => {
               <View style={styles.bottomDiv}>
                 <TouchableOpacity onPress={() => navigation.navigate("Login")}>
                   <Text style={styles.signupTextFromLogin}>
-                    Already have an account? Signin
+                    Already have an account? Sign in
                   </Text>
                 </TouchableOpacity>
               </View>
