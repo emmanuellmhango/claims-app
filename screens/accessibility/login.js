@@ -10,7 +10,11 @@ import {
   ImageBackground,
 } from "react-native";
 import { Formik } from "formik";
+import axios from "axios";
+import { useDispatch } from "react-redux";
+import { addUser } from "../../state/userSlice";
 import { styles } from "../../styles/styles";
+import URL from "../../state/url";
 
 const DismissKeyboard = ({ children }) => (
   <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -19,6 +23,33 @@ const DismissKeyboard = ({ children }) => (
 );
 
 const Login = ({ navigation }) => {
+  const dispatch = useDispatch();
+  const handleLogin = async (values) => {
+    const data = {
+      email: values.email,
+      password: values.password,
+    };
+    try {
+      const response = await axios.get(
+        URL,
+        { params: data },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      const { success, user } = response.data;
+      if (success) {
+        dispatch(addUser(user));
+        navigation.navigate("Dashboard");
+      } else {
+        alert("Oops!. Seems there was an error. Please try again");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <DismissKeyboard>
       <View style={styles.loginWrapper}>
@@ -29,13 +60,17 @@ const Login = ({ navigation }) => {
         >
           <Formik
             initialValues={{ email: "", password: "" }}
-            onSubmit={(values) => {
-              if (values.email === "Admin" && values.password == "admin") {
-                navigation.navigate("Dashboard");
-              } else {
-                alert("Invalid Credentials");
+            validate={(values) => {
+              const errors = {};
+              if (!values.email) {
+                errors.email = "Email is required";
               }
+              if (!values.password) {
+                errors.password = "Password is required";
+              }
+              return errors;
             }}
+            onSubmit={handleLogin}
           >
             {(props) => (
               <View style={styles.loginForm}>

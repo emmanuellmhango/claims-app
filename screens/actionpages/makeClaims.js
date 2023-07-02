@@ -13,7 +13,9 @@ import {
 import { Formik } from "formik";
 import { Picker } from "@react-native-picker/picker";
 import * as Location from "expo-location";
-import { useDispatch } from "react-redux";
+import axios from "axios";
+import URL from "../../state/url";
+import { useDispatch, useSelector } from "react-redux";
 import { addClaim } from "../../state/addClaimSlice";
 import { styles } from "../../styles/styles";
 
@@ -29,6 +31,7 @@ const MakeClaim = ({ route, navigation }) => {
   const [operator, setOperator] = useState("");
   const [location, setLocation] = useState(null);
   const [currentDate, setCurrentDate] = useState("");
+  const user = useSelector((state) => state.user.user);
   const { images } = route.params;
 
   useEffect(() => {
@@ -76,26 +79,43 @@ const MakeClaim = ({ route, navigation }) => {
     { label: "Telkom", value: "telkom" },
     { label: "Rain", value: "rain" },
   ];
-  const onSubmit = (values) => {
+  const onSubmit = async (values) => {
     const modifiedValues = {
       ...values,
-      location: location,
+      location: JSON.stringify(location),
       operator: operator,
       category: category,
-      pictures: [...images],
+      img_one: images[0],
+      img_two: images[1],
       date: currentDate,
+      forwarded: "false",
     };
     if (
       modifiedValues.category &&
       modifiedValues.operator &&
       modifiedValues.location &&
-      modifiedValues.pictures
+      images.length === 2
     ) {
-      dispatch(addClaim(modifiedValues));
-      Alert.alert("CONFIRMATION", "The Claim has been submitted", [
-        null,
-        { text: "OK", onPress: () => navigation.navigate("Explore") },
-      ]);
+      // console.log(modifiedValues);
+
+      const response = await axios.post(
+        `${URL}/${user[0].id}/claims`,
+        modifiedValues,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      if (response.status === 200) {
+        dispatch(addClaim(modifiedValues));
+        Alert.alert("CONFIRMATION", "The Claim has been submitted", [
+          null,
+          { text: "OK", onPress: () => navigation.navigate("Explore") },
+        ]);
+      } else {
+        alert("Oops! something went wrong, please try again");
+      }
     } else {
       alert("Please fill in all fields");
     }
