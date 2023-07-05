@@ -6,6 +6,7 @@ import {
   Image,
   TouchableOpacity,
   ImageBackground,
+  Keyboard,
   TouchableWithoutFeedback,
 } from "react-native";
 import { Formik } from "formik";
@@ -44,6 +45,9 @@ const Signup = ({ navigation }) => {
         alert("Oops!. Seems there was an error. Please try again");
       }
     } catch (error) {
+      alert(
+        "Seems the email is already registered. use another email or login"
+      );
       console.log(error.response.data);
     }
   };

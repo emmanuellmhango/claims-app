@@ -8,7 +8,7 @@ const addClaimSlice = createSlice({
   initialState,
   reducers: {
     addClaim: (state, action) => {
-      state.claims.push(action.payload);
+      state.claims = action.payload;
     },
   },
 });

@@ -1,14 +1,26 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, TextInput } from "react-native";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { fetchClaims } from "../../state/fetchClaims";
+import { addClaim } from "../../state/addClaimSlice";
 import { styles } from "../../styles/styles";
 import AllClaims from "./allclaims";
 
 const DashBoard = ({ navigation }) => {
+  const dispatch = useDispatch();
   const claimsAll = useSelector((state) => state.claims.claims);
+  const { user } = useSelector((state) => state.user);
   const [weeklyClaims, setWeeklyClaims] = useState("");
   const [topCategory, setTopCategory] = useState("");
+
+  useEffect(() => {
+    const fetchClaimsByUser = async () => {
+      const claims = await fetchClaims(user.id);
+      dispatch(addClaim(claims));
+    };
+    fetchClaimsByUser();
+  }, []);
 
   useEffect(() => {
     if (claimsAll) {

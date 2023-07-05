@@ -14,9 +14,11 @@ import { Formik } from "formik";
 import { Picker } from "@react-native-picker/picker";
 import * as Location from "expo-location";
 import axios from "axios";
-import URL from "../../state/url";
+import { GENERAL_URL } from "../../state/url";
 import { useDispatch, useSelector } from "react-redux";
 import { addClaim } from "../../state/addClaimSlice";
+import { addCategory } from "../../state/categorySlice";
+import { addClient } from "../../state/clientSlice";
 import { styles } from "../../styles/styles";
 
 const DismissKeyboard = ({ children }) => (
@@ -28,32 +30,22 @@ const DismissKeyboard = ({ children }) => (
 const MakeClaim = ({ route, navigation }) => {
   const dispatch = useDispatch();
   const [category, setCategory] = useState("");
-  const [operator, setOperator] = useState("");
+  const [client, setClient] = useState("");
   const [location, setLocation] = useState(null);
-  const [currentDate, setCurrentDate] = useState("");
   const user = useSelector((state) => state.user.user);
+  const { categories } = useSelector((state) => state.categories);
+  const { clients } = useSelector((state) => state.clients);
+
   const { images } = route.params;
 
   useEffect(() => {
     getLocationAsync();
   }, [location]);
 
-  useEffect(() => {
-    const date = new Date();
-    let day = date.getDate();
-    let month = date.getMonth() + 1;
-    let year = date.getFullYear();
-    let hours = date.getHours();
-    let min = date.getMinutes();
-    let sec = date.getSeconds();
-    const curDate = `${day}/${month}/${year} ${hours}:${min}:${sec}`;
-    setCurrentDate(curDate);
-  }, [currentDate]);
-
   const getLocationAsync = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
-      console.log("Permission to access location was denied");
+      alert("Oops!, Please add location permissions first.");
       return;
     }
     try {
@@ -64,42 +56,61 @@ const MakeClaim = ({ route, navigation }) => {
     }
   };
 
-  const categories = [
-    { label: "Apple", value: "apple" },
-    { label: "Mango", value: "mango" },
-    { label: "Banana", value: "banana" },
-    { label: "Pear", value: "pear" },
-    { label: "Pepper", value: "pepper" },
-  ];
+  const getCategories = async () => {
+    const response = await axios.get(`${GENERAL_URL}/categories`);
+    const { success, categories } = response.data;
+    if (success) {
+      dispatch(addCategory(categories));
+    }
+  };
 
-  const operators = [
-    { label: "Vodacom", value: "vodacom" },
-    { label: "MTN", value: "mtn" },
-    { label: "Cell C", value: "cellc" },
-    { label: "Telkom", value: "telkom" },
-    { label: "Rain", value: "rain" },
-  ];
+  const fetchClients = async () => {
+    try {
+      const response = await axios.get(`${GENERAL_URL}/clients`);
+      const { success, clients } = response.data;
+      if (success) {
+        dispatch(addClient(clients));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchClients();
+  }, []);
+
+  useEffect(() => {
+    getCategories();
+  }, []);
+
   const onSubmit = async (values) => {
     const modifiedValues = {
       ...values,
       location: JSON.stringify(location),
-      operator: operator,
-      category: category,
+      client_id: client,
+      category_id: category,
       img_one: images[0],
       img_two: images[1],
-      date: currentDate,
       forwarded: "false",
     };
+    const formData = new FormData();
+    formData.append("claim[img_one]", modifiedValues.img_one);
+    formData.append("claim[img_two]", modifiedValues.img_two);
+    formData.append("claim[category_id]", modifiedValues.category_id);
+    formData.append("claim[client_id]", modifiedValues.client_id);
+    formData.append("claim[location]", modifiedValues.location);
+    formData.append("claim[comment]", modifiedValues.comment);
+    formData.append("claim[forwarded]", modifiedValues.forwarded);
+
     if (
       modifiedValues.category &&
       modifiedValues.operator &&
       modifiedValues.location &&
       images.length === 2
     ) {
-      // console.log(modifiedValues);
-
       const response = await axios.post(
-        `${URL}/${user[0].id}/claims`,
+        `${GENERAL_URL}/claims`,
         modifiedValues,
         {
           headers: {
@@ -107,8 +118,9 @@ const MakeClaim = ({ route, navigation }) => {
           },
         }
       );
-      if (response.status === 200) {
-        dispatch(addClaim(modifiedValues));
+      const { success, claims } = response.data;
+      if (success) {
+        dispatch(addClaim(claims));
         Alert.alert("CONFIRMATION", "The Claim has been submitted", [
           null,
           { text: "OK", onPress: () => navigation.navigate("Explore") },
@@ -158,8 +170,8 @@ const MakeClaim = ({ route, navigation }) => {
                     {categories.map((item, index) => {
                       return (
                         <Picker.Item
-                          label={item.label}
-                          value={item.value}
+                          label={item.name}
+                          value={item.id}
                           key={index}
                         />
                       );
@@ -169,18 +181,18 @@ const MakeClaim = ({ route, navigation }) => {
                 <Text style={styles.textLeftClaim}>Client</Text>
                 <View style={styles.border}>
                   <Picker
-                    selectedValue={operator}
+                    selectedValue={client}
                     onValueChange={(itemValue, itemIndex) =>
-                      setOperator(itemValue)
+                      setClient(itemValue)
                     }
                     style={styles.inputSelector}
                   >
                     <Picker.Item label="Select Client" value="" />
-                    {operators.map((item, index) => {
+                    {clients.map((client, index) => {
                       return (
                         <Picker.Item
-                          label={item.label}
-                          value={item.value}
+                          label={client.name}
+                          value={client.id}
                           key={index}
                         />
                       );
