@@ -32,7 +32,7 @@ const MakeClaim = ({ route, navigation }) => {
   const [category, setCategory] = useState("");
   const [client, setClient] = useState("");
   const [location, setLocation] = useState(null);
-  const user = useSelector((state) => state.user.user);
+  const { user } = useSelector((state) => state.user);
   const { categories } = useSelector((state) => state.categories);
   const { clients } = useSelector((state) => state.clients);
 
@@ -84,49 +84,74 @@ const MakeClaim = ({ route, navigation }) => {
     getCategories();
   }, []);
 
+  const generateRandomString = () => {
+    const characters =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let result = "";
+
+    for (let i = 0; i < 15; i++) {
+      const randomIndex = Math.floor(Math.random() * characters.length);
+      result += characters.charAt(randomIndex);
+    }
+
+    return result;
+  };
+
+  const generateImgData = (img) => {
+    const uriParts = img.split(".");
+    const fileType = uriParts[uriParts.length - 1];
+    const fname = generateRandomString();
+    return {
+      uri: img,
+      type: `image/${fileType}`,
+      name: `${fname}.${fileType}`,
+    };
+  };
   const onSubmit = async (values) => {
     const modifiedValues = {
       ...values,
-      location: JSON.stringify(location),
-      client_id: client,
       category_id: category,
-      img_one: images[0],
-      img_two: images[1],
-      forwarded: "false",
+      client_id: client,
+      location: JSON.stringify(location),
+      comment: values.comment,
     };
     const formData = new FormData();
-    formData.append("claim[img_one]", modifiedValues.img_one);
-    formData.append("claim[img_two]", modifiedValues.img_two);
     formData.append("claim[category_id]", modifiedValues.category_id);
     formData.append("claim[client_id]", modifiedValues.client_id);
     formData.append("claim[location]", modifiedValues.location);
     formData.append("claim[comment]", modifiedValues.comment);
-    formData.append("claim[forwarded]", modifiedValues.forwarded);
+    formData.append("claim[forwarded]", "false");
+    formData.append("claim[user_id]", user.id);
+
+    for (let i = 0; i < images.length; i++) {
+      formData.append(`claim[images][]`, generateImgData(images[i]));
+    }
 
     if (
-      modifiedValues.category &&
-      modifiedValues.operator &&
-      modifiedValues.location &&
+      modifiedValues.category_id &&
+      modifiedValues.client_id &&
+      location &&
       images.length === 2
     ) {
-      const response = await axios.post(
-        `${GENERAL_URL}/claims`,
-        modifiedValues,
-        {
+      try {
+        const response = await axios.post(`${GENERAL_URL}/claims`, formData, {
           headers: {
-            "Content-Type": "application/json",
+            "Content-Type": "multipart/form-data",
           },
+        });
+        const { success, claims } = response.data;
+        if (success) {
+          dispatch(addClaim(claims));
+          Alert.alert("CONFIRMATION", "The Claim has been submitted", [
+            null,
+            { text: "OK", onPress: () => navigation.navigate("Explore") },
+          ]);
+        } else {
+          alert("Oops! something went wrong, please try again");
         }
-      );
-      const { success, claims } = response.data;
-      if (success) {
-        dispatch(addClaim(claims));
-        Alert.alert("CONFIRMATION", "The Claim has been submitted", [
-          null,
-          { text: "OK", onPress: () => navigation.navigate("Explore") },
-        ]);
-      } else {
+      } catch (error) {
         alert("Oops! something went wrong, please try again");
+        console.log(error);
       }
     } else {
       alert("Please fill in all fields");

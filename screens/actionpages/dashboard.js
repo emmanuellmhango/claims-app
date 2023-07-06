@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, TextInput } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  ScrollView,
+  Image,
+} from "react-native";
 import { useSelector, useDispatch } from "react-redux";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { fetchClaims } from "../../state/fetchClaims";
 import { addClaim } from "../../state/addClaimSlice";
 import { styles } from "../../styles/styles";
-import AllClaims from "./allclaims";
 
 const DashBoard = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -14,10 +20,30 @@ const DashBoard = ({ navigation }) => {
   const [weeklyClaims, setWeeklyClaims] = useState("");
   const [topCategory, setTopCategory] = useState("");
 
+  const viewOnMap = (claim) => {
+    navigation.navigate("ViewMap", { claim: claim });
+  };
+
+  const convertLocationToObject = (data) => {
+    const newData = { ...data };
+    if (newData.claims) {
+      newData.claims.forEach((claim) => {
+        if (claim.location && typeof claim.location === "string") {
+          claim.location = JSON.parse(claim.location);
+        }
+      });
+    }
+
+    return JSON.stringify(newData, null, 2);
+  };
+
   useEffect(() => {
     const fetchClaimsByUser = async () => {
-      const claims = await fetchClaims(user.id);
-      dispatch(addClaim(claims));
+      const response = await fetchClaims(user.id);
+      if (response !== null) {
+        const cla = convertLocationToObject(response);
+        dispatch(addClaim(cla));
+      }
     };
     fetchClaimsByUser();
   }, []);
@@ -25,6 +51,9 @@ const DashBoard = ({ navigation }) => {
   useEffect(() => {
     if (claimsAll) {
       findMostOccurringCategory(claimsAll);
+    } else {
+      setWeeklyClaims(`Weekly Claims: 0`);
+      setTopCategory(`Top Category: --`);
     }
   }, [claimsAll]);
 
@@ -75,12 +104,53 @@ const DashBoard = ({ navigation }) => {
         </TouchableOpacity>
       </View>
       <View style={styles.claimsContainer}>
-        {claimsAll?.length < 1 || claimsAll === null ? (
-          <View style={styles.NoContentFlyItemContainer}>
-            <Text style={styles.NoClaimsFlyText}>No Claims Yet</Text>
+        {claimsAll?.length < 1 ||
+          (claimsAll === null && (
+            <View style={styles.NoContentFlyItemContainer}>
+              <Text style={styles.NoClaimsFlyText}>No Claims Yet</Text>
+            </View>
+          ))}
+        {claimsAll?.length > 0 && (
+          <View style={styles.modalFly}>
+            <Text style={styles.flyTitle}>Recent Claims</Text>
+            <View style={styles.flyContainer}>
+              <ScrollView>
+                {claimsAll &&
+                  claimsAll.map((claim, index) => {
+                    return (
+                      <TouchableOpacity
+                        onPress={() => viewOnMap(claim)}
+                        key={index}
+                      >
+                        <View style={styles.flyItemContainer}>
+                          <View style={styles.flyItem}>
+                            <View style={styles.flyImageContainer}>
+                              {/* <Image
+                                source={{ uri: claim.pictures[0] }}
+                                style={styles.flyImage}
+                                resizeMode="contain"
+                              /> */}
+                              <Text>IMG</Text>
+                            </View>
+                            <View style={styles.flyTextContainer}>
+                              <Text style={styles.flyText}>
+                                {claim.comment.slice(0, 20)}
+                              </Text>
+                              <Text style={styles.flyTextClaims}>
+                                {claim.category} | {claim.operator}
+                              </Text>
+                              <Text style={styles.flyTextClaims}>
+                                {claim.date}
+                              </Text>
+                            </View>
+                          </View>
+                        </View>
+                      </TouchableOpacity>
+                    );
+                  })}
+              </ScrollView>
+            </View>
           </View>
-        ) : (
-          <AllClaims claims={claimsAll} />
         )}
       </View>
       <View style={styles.modal}>

@@ -44,7 +44,7 @@ const Login = ({ navigation }) => {
         dispatch(addUser(user));
         navigation.navigate("Dashboard");
       } else {
-        alert("Oops!. Seems there was an error. Please try again");
+        alert("Oops!. Seems the email is not registered. Please try again");
       }
     } catch (error) {
       console.log(error);

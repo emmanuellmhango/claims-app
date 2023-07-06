@@ -4,11 +4,12 @@ import { GENERAL_URL } from "./url";
 export const fetchClaims = async (id) => {
   try {
     const response = await axios.get(`${GENERAL_URL}/claims_for_mobile`, {
-      params: id,
+      params: { user_id: id },
     });
+    console.log(response.data);
     const { success, claims } = response.data;
-    return success ? claims : 0;
+    return success ? claims : null;
   } catch (error) {
-    return 0;
+    console.log(error);
   }
 };
