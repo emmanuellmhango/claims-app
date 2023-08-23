@@ -24,29 +24,17 @@ const DashBoard = ({ navigation }) => {
     navigation.navigate("ViewMap", { claim: claim });
   };
 
-  const convertLocationToObject = (data) => {
-    const newData = { ...data };
-    if (newData.claims) {
-      newData.claims.forEach((claim) => {
-        if (claim.location && typeof claim.location === "string") {
-          claim.location = JSON.parse(claim.location);
-        }
-      });
-    }
-
-    return JSON.stringify(newData, null, 2);
-  };
-
   useEffect(() => {
     const fetchClaimsByUser = async () => {
       const response = await fetchClaims(user.id);
       if (response !== null) {
-        const cla = convertLocationToObject(response);
-        dispatch(addClaim(cla));
+        dispatch(addClaim(response));
       }
     };
     fetchClaimsByUser();
   }, []);
+
+  console.log(claimsAll);
 
   useEffect(() => {
     if (claimsAll) {
